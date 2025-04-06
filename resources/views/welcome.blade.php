@@ -125,21 +125,19 @@
                 <button class="view-details" id="view-details-{{ $product->id }}" data-product-id="{{ $product->id }}">
                     <a href="{{ route('product.details', ['product_id' => $product->id]) }}">View Details</a>
                 </button>
-                <!-- <a href="{{ route('product.details', ['product_id' => $product->id]) }}">View Details</a> -->
             </div>
         @endforeach
     </div>
 
-    <!-- Stripe Payment Form (will be dynamically handled) -->
+ 
     <div id="payment-form">
         <h3>Complete Your Payment</h3>
-        <div id="card-element"></div> <!-- A Stripe Element will be inserted here. -->
+        <div id="card-element"></div> 
         <button id="submit">Pay Now</button>
         <div id="error-message"></div>
     </div>
 
     <script>
-        // Initialize Stripe
         var stripe = Stripe('pk_test_51NHtioI7D8hVACYMGNJNInarAq3XvUTkGQh6fABjcisQMDKE3eA6myuCZK4WAmz2tAfu3m3vG8lZAYvR6GbpV20600uHHIDjAh'); // Replace with your public Stripe key
         var elements = stripe.elements();
         var cardElement = elements.create('card');
@@ -148,13 +146,13 @@
         var submitButton = document.getElementById('submit');
         var productId = null;
 
-        // Handle Buy Now button click
+       
         document.querySelectorAll('.buy-now').forEach(function (button) {
             button.addEventListener('click', function () {
                 productId = this.getAttribute('data-product-id');
                 var price = this.getAttribute('data-price');
 
-                // Show the payment form
+                
                 paymentForm.style.display = 'block';
                 stripe.createPaymentMethod({
                     type: 'card',
@@ -164,10 +162,9 @@
                         errorMessage.textContent = result.error.message;
                         errorMessage.style.display = 'block';
                     } else {
-                        // Handle payment request
                         fetch('/create-payment-intent', {
                             method: 'POST',
-                            body: JSON.stringify({ amount: price * 100 }), // Convert to cents
+                            body: JSON.stringify({ amount: price * 100 }), 
                             headers: {
                                 'Content-Type': 'application/json'
                             }
@@ -192,8 +189,6 @@
                 });
             });
         });
-
-        // Attach card element to the page
         cardElement.mount('#card-element');
     </script>
 </body>

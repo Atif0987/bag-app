@@ -46,7 +46,7 @@
 
 <div class="thank-you-box">
     <h1>Thank You!</h1>
-    <p>Your payment was successful. We're preparing your bag for delivery!</p>
+    <p>Your payment was successful. We're preparing your product for delivery!</p>
     <p>You can manage your subscription from your dashboard at any time.</p>
     <a href="/">Back to Home</a>
 </div>

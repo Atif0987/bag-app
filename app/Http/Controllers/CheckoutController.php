@@ -34,13 +34,11 @@ class CheckoutController extends Controller
             'subscription' => 'required'
         ]);
         try {
-            // Set Stripe API key
-            // Stripe::setApiKey(env('STRIPE_SECRET'));
             Stripe::setApiKey('sk_test_51NHtioI7D8hVACYM6d9SvOYal70d4aw7jCvBzRjWeMzYyKb9HvmereVJLXRUSAshLAk3cy9o4qQRsyF3gENLxZfR00NPEc1YDR');
 
-            // Charge the customer
+            
             $charge = Charge::create([
-                'amount' => $request->price * 100, // Stripe uses cents
+                'amount' => $request->price * 100, 
                 'currency' => 'usd',
                 'description' => 'Bag Rental: ' . $request->product,
                 'source' => $request->token,
@@ -51,8 +49,6 @@ class CheckoutController extends Controller
                     'customer_address' => $request->address,
                 ]
             ]);
-
-            // You can also store order/subscription info in DB here
 
             return response()->json(['success' => true]);
 
@@ -89,7 +85,7 @@ class CheckoutController extends Controller
     $amount = $request->amount;
     $subscriptionId = $subscription->id;
 
-    // ✅ Store order in DB
+   
     $order = Order::create([
         'name' => $request->name,
         'email' => $request->email,
@@ -100,10 +96,10 @@ class CheckoutController extends Controller
         'stripe_subscription_id' => $subscriptionId,
     ]);
 
-    // ✅ Send email receipt
+    
     Mail::to($request->email)->send(new OrderReceipt($order));
 
-    // ✅ Redirect to thank you page
+    
     return redirect()->route('thankyou')->with('message', 'Subscription successful!');
 }
 

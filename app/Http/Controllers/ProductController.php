@@ -16,10 +16,9 @@ class ProductController extends Controller
         $client = new Client();
         $response = $client->get('https://fakestoreapi.com/products'); 
         $products = json_decode($response->getBody()->getContents());
-        // Save products to local database
         foreach ($products as $productData) {
             Product::updateOrCreate(
-                ['id' => $productData->id], // Unique identifier based on the product's ID
+                ['id' => $productData->id], 
                 [
                     'title' => $productData->title,
                     'description' => $productData->description,
@@ -47,10 +46,10 @@ class ProductController extends Controller
     }
     public function processPayment(Request $request)
     {
-        // Set your Stripe secret key
+    
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        // Create a new Stripe Checkout session
+        
         $session = Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [
@@ -60,7 +59,7 @@ class ProductController extends Controller
                         'product_data' => [
                             'name' => 'Bag Rental - ' . $request->product_id,
                         ],
-                        'unit_amount' => 1000, // Dummy price, update it with the actual price logic
+                        'unit_amount' => 1000, 
                     ],
                     'quantity' => 1,
                 ],
