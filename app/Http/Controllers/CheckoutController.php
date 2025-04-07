@@ -50,6 +50,18 @@ class CheckoutController extends Controller
                 ]
             ]);
 
+             // Create the order and associate with the logged-in user
+            $order = Order::create([
+                'user_id' => auth()->user()->id, // Store user_id in the order
+                'name' => $request->name,
+                'email' => $request->email,
+                'address' => $request->address,
+                'product_name' => $request->product,
+                'subscription_plan' => $request->subscription,
+                'amount' => $request->price,
+                'stripe_subscription_id' => null, // No subscription for one-time payment
+            ]);
+
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
@@ -62,12 +74,10 @@ class CheckoutController extends Controller
     }
     public function processSubscription(Request $request)
 {
-    // Stripe::setApiKey(env('STRIPE_SECRET'));
     Stripe::setApiKey('sk_test_51NHtioI7D8hVACYM6d9SvOYal70d4aw7jCvBzRjWeMzYyKb9HvmereVJLXRUSAshLAk3cy9o4qQRsyF3gENLxZfR00NPEc1YDR');
 
-
     // Create Stripe Customer
-    $customer = Customer::create([
+    $customer = \Stripe\Customer::create([
         'email' => $request->email,
         'name' => $request->name,
         'address' => ['line1' => $request->address],
@@ -76,31 +86,58 @@ class CheckoutController extends Controller
     ]);
 
     // Create Stripe Subscription (replace 'price_xxx' with your actual Stripe price ID)
-    $subscription = Subscription::create([
+    $stripeSubscription = \Stripe\Subscription::create([
         'customer' => $customer->id,
-        'items' => [[ 'price' => $request->stripe_price_id ]],
+        'items' => [['price' => $request->stripe_price_id]],
         'expand' => ['latest_invoice.payment_intent'],
     ]);
 
-    $amount = $request->amount;
-    $subscriptionId = $subscription->id;
+    // Get the Stripe subscription ID
+    $stripeSubscriptionId = $stripeSubscription->id;
 
-   
+    // Get subscription details (amount and other order details)
+    $amount = $request->amount;
+
+    // Create the order and associate with the logged-in user
     $order = Order::create([
+        'user_id' => auth()->user()->id, // Store user_id in the order
         'name' => $request->name,
         'email' => $request->email,
         'address' => $request->address,
         'product_name' => $request->product,
         'subscription_plan' => $request->subscription,
         'amount' => $amount,
-        'stripe_subscription_id' => $subscriptionId,
+        'stripe_subscription_id' => $stripeSubscriptionId, // Store the Stripe subscription ID here
     ]);
 
-    
+    // Create a subscription record in your 'subscriptions' table
+    $subscriptionRecord = Subscription::create([
+        'user_id' => auth()->user()->id,
+        'plan' => $request->subscription,  // '3_months', '6_months', or '9_months'
+        'start_date' => now(),
+        'end_date' => now()->addMonths($this->getPlanDuration($request->subscription)),
+        'is_active' => true,
+    ]);
+
+    // Send order receipt email
     Mail::to($request->email)->send(new OrderReceipt($order));
 
-    
     return redirect()->route('thankyou')->with('message', 'Subscription successful!');
 }
+
+private function getPlanDuration($plan)
+{
+    switch ($plan) {
+        case '3_months':
+            return 3;
+        case '6_months':
+            return 6;
+        case '9_months':
+            return 9;
+        default:
+            return 0;
+    }
+}
+
 
 }

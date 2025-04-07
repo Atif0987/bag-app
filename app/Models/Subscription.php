@@ -1,17 +1,5 @@
 <?php
 
-// namespace App\Models;
-
-// use Illuminate\Database\Eloquent\Model;
-
-
-// class Subscription extends Model
-// {
-    
-// }
-
-// app/Models/Subscription.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,13 +21,16 @@ class Subscription extends Model
     // Define the logic for auto-renewal
     public function autoRenew()
     {
-        if ($this->is_active && now()->greaterThan($this->end_date)) {
+        if ($this->is_active && now()->greaterThanOrEqualTo($this->end_date)) {
+            $newEndDate = now()->addMonths($this->getPlanDuration());
             $this->update([
                 'start_date' => now(),
-                'end_date' => now()->addMonths($this->getPlanDuration()),
+                'end_date' => $newEndDate,
+                'is_active' => true,
             ]);
         }
     }
+    
 
     // Get the number of months for the selected plan
     private function getPlanDuration()

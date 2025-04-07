@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'address',
@@ -15,4 +16,9 @@ class Order extends Model
         'amount',
         'stripe_subscription_id',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

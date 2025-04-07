@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('email');
             $table->string('address');
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->decimal('amount', 8, 2);
             $table->string('stripe_subscription_id')->nullable();
             $table->timestamps();
-        });
+        });        
     }
 
     /**

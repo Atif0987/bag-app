@@ -5,10 +5,21 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 
 
-Route::get('/', [ProductController::class, 'showProducts'])->name('welcome');
+// Route::get('/', [ProductController::class, 'showProducts'])->name('welcome');
+// Route::get('/', function () {
+//     return redirect()->route(Auth::check() ? 'dashboard' : 'login');
+// });
+
+Route::get('/', function () {
+    if (Auth::check()) {
+        return app(\App\Http\Controllers\ProductController::class)->showProducts();
+    }
+    return redirect()->route('login');
+})->name('welcome');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
