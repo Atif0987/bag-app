@@ -16,6 +16,7 @@ class ProductController extends Controller
         $client = new Client();
         $response = $client->get('https://fakestoreapi.com/products'); 
         $products = json_decode($response->getBody()->getContents());
+        $products = array_slice($products, 0, 4);
         foreach ($products as $productData) {
             Product::updateOrCreate(
                 ['id' => $productData->id], 

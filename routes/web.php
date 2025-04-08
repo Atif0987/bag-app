@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,9 +22,12 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->name('welcome');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,6 +45,7 @@ Route::post('/process-subscription', [CheckoutController::class, 'processSubscri
 Route::get('/thank-you', function () {
     return view('thankyou');
 })->name('thankyou');
+Route::get('/swap/{order}', [OrderController::class, 'swap'])->name('swap.bag');
 
 // Route::get('/checkout/{product_id}', [ProductController::class, 'checkout'])->name('checkout');
 
